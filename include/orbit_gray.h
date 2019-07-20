@@ -139,7 +139,7 @@ South latitudes are negative.
 East longitude is positive, west negative.
 
 
-/*################### SATELLITE ORBITAL ELEMENTS ####################*/
+################### SATELLITE ORBITAL ELEMENTS ####################*/
 
   double theta,
          tsince;   // time since epoch in minutes
@@ -283,7 +283,15 @@ const double Satellite :: s ( 1.0122292801892716);
         rval += twopi;
      return(rval);
   }
-
+  //  
+  void printvec(double v1[3])
+  {
+    printf("[ ");
+    for (int i = 0; i < 3; i++) {
+      printf(" %f",v1[i]);
+    }
+    printf("]\n");   
+  }
 
 ////////////// class member functions /////////////////////////////////////////
 
@@ -1935,4 +1943,3 @@ void Satellite :: sxp4(double tsince)
      sgp4(tsince);
 
 }
-

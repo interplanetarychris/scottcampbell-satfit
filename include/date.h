@@ -1,5 +1,5 @@
 // date.h
-// by Scott Campbell campbel7@stelera.net
+// by Scott Campbell campbel7@the-i.net
 
 /****************************** Class Date ************************************
 *                                                                             *
@@ -89,9 +89,9 @@
 #include <cstdlib>  // for atof
 #include <cmath>    // for fmod in sidereal()
 #include <time.h>   // for now()
+#include <string.h> // for strlen
+
 using namespace std;
-
-
 
 ////////////// define classes /////////////////////////////////////////////////
 
@@ -110,7 +110,7 @@ private:
   {
     printf("%s", prompt);
     if (feof(stdin)) exit(0);
-    gets(buffer);
+    fgets(buffer,sizeof(buffer),stdin);
     return buffer;
   }
 
@@ -260,7 +260,7 @@ public:
 
   void Date :: calc_tle()      // calculate date in tle format and day-of-year
   {
-    int k = ((int)yy%4 == 0 && (int)yy%100 != 0 || (int)yy%400 == 0) ? 1 : 2;
+    int k = ( ((int)yy%4 == 0 && (int)yy%100 != 0) || (int)yy%400 == 0) ? 1 : 2;
     doy = (int)(275 * mm / 9) - k * (int)(mm / 12 + .75) + (int)dd - 30;
     tle = doy + hr / 24 + mn / 1440 + ss / 86400;
     if(yy >= 2000) tle += 1000 * (yy - 2000);
@@ -273,7 +273,7 @@ public:
     double dx = tle - (int)tle;             // place holder for decimal day
     doy = (int)((int)tle - yy * 1000);
     yy += 2000;                             // update 01/01/2100
-    int k = ((int)yy%4 == 0 && (int)yy%100 != 0 || (int)yy%400 == 0) ? 1 : 2;
+    int k = ( ((int)yy%4 == 0 && (int)yy%100 != 0) || (int)yy%400 == 0) ? 1 : 2;
     mm = (int)(9 * (k + doy) / 275 + .98) + 1;
     if(doy < 32)
       mm = 1;
@@ -306,22 +306,22 @@ public:
   {
     char buf[20];
     printf("Year   [%.0f", yy);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
       yy = atof(buf);
     printf("Month  [%.0f", mm);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
       mm = atof(buf);
     printf("Day    [%.0f", dd);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
       dd = atof(buf);
     printf("Hour   [%.0f", hr);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
       hr = atof(buf);
     printf("Minute [%.0f", mn);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
       mn = atof(buf);
     printf("Second [%.0f", ss);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
       ss = atof(buf);
     julian();
     sidereal();
@@ -359,7 +359,7 @@ private:
   {
     printf("%s", prompt);
     if (feof(stdin)) exit(0);
-    gets(buffer);
+    fgets(buffer,sizeof(buffer),stdin);
     return buffer;
   }
 
@@ -375,7 +375,7 @@ public:
 // single argument constructor takes julian date and uses default location
   Locate(double jdi);
 // 4 - argument constructor to input date and location parameters
-  Locate(double jdi, double lat, double lon, double hite);
+ Locate(double jdi, double lat, double lon, double hite);
 // input new location variables on existing object
   void input();
   // location as a function of date
@@ -383,7 +383,7 @@ public:
 
 };  // end class Locate ///////////////////////////////////////////////////////
 const double Locate::de2ra(.0174532925199433);
-const double Locate::xkmper(6378.135);   // equatorial earth radius, km
+const double Locate::xkmper(6378.1363);   // equatorial earth radius, km
 
 // single argument constructor takes julian date and uses default location
   Locate :: Locate(double jdi) :  jd(jdi)
@@ -393,12 +393,12 @@ const double Locate::xkmper(6378.135);   // equatorial earth radius, km
   }
 
 // 4 - argument constructor to input date and location parameters
-  Locate :: Locate(double jdi, double lat, double lon, double hite) :
+ Locate :: Locate(double jdi, double lat, double lon, double hite) :
                       jd(jdi),    la(lat),    lo(lon),    hh(hite)
-  {
+ {
     convert();
     rgeo();
-  }
+ }
 
   // input new location variables on existing object
   void Locate :: input()
@@ -406,13 +406,13 @@ const double Locate::xkmper(6378.135);   // equatorial earth radius, km
     char buf[20];
     printf("\n\n");
     printf("Latitude ( + N ) [%6.2f", la / de2ra);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
     {
       la = atof(buf);
       la *= de2ra;              // convert to radians
     }
     printf("E longitude      [%6.2f", lo);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
     {
       lo = atof(buf);
       lo = mod(lo, 360);       // convert w long(-) to e long(+)
@@ -420,7 +420,7 @@ const double Locate::xkmper(6378.135);   // equatorial earth radius, km
     // swap printf if units in feet
 //    printf("Altitude MSL(ft) [%6.2f", hh * xkmper / .0003048);
     printf("Altitude MSL(m)  [%6.2f", hh * xkmper * 1000);
-    if (strlen(s_in("]: ", buf)))
+    if (strlen(s_in((char *)"]: ", buf)))
     {
       hh = atof(buf);
 //      hh *= .3048 ;             // feet to meters <- comment out for meters
@@ -471,4 +471,3 @@ void Locate :: home()        // default location values, Beeville TX
    hh = 107;                 // elevation MSL in meters (see convert)
    convert();
 }
-
